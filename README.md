@@ -1,5 +1,5 @@
 # DimmableKitchenLightGesture
-Dimmable LED kitchen light using Arduino and the APDS-9660 gesture sensor and a 12V RGBWW led strip.
+Dimmable LED kitchen light using Arduino and the APDS-9960 gesture sensor and a 12V RGBWW led strip.
 
 Set light level by moving your hand up and down in front of the sensor. Hold still for 1 second to lock the light level.
 
