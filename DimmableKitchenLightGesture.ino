@@ -1,4 +1,3 @@
-#include <FastLED.h>
 #include <SparkFun_APDS9960.h>
 
 // Pins
@@ -16,8 +15,8 @@
 #define RED_BASE_LEVEL 255
 #define WW_BASE_LEVEL 255
 
-#define LOCK_TIME 1000
-#define LOCK_THRESHOLD 8
+#define LOCK_TIME 700
+#define LOCK_THRESHOLD 12
 
 // Global Variables
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
@@ -82,11 +81,11 @@ void set_light_level (byte level) {
       if (millis() - last_lock_time > LOCK_TIME) {
         // Level has been held steady for a while. Blink to acknowledge and sleep to allow time to remove hand from sensor.
         turn_off();
-        busy_wait(150);
+        delay(150);
         adjust(level); // Set level back to selected level
         last_lock_level = 0;
         last_lock_time = 0;
-        busy_wait(LOCK_TIME * 2);
+        delay(LOCK_TIME * 2);
       } else {
         adjust(level);
       }
@@ -116,17 +115,28 @@ void adjust(byte level) {
     digitalWrite(RED_OUTPUT, HIGH);
     digitalWrite(WW_OUTPUT, HIGH);
   } else {
-    float adjustment = (1.0 + level) / 255.0;
+    if (level > 185) {
+      level = 255;
+    } else if (level > 145) {
+      level = 185;
+    } else if (level > 105) {
+      level = 125;
+    } else if (level > 65) {
+      level = 75;
+    } else {
+      level = 25;
+    }
+    float adjustment = level / 255.0;
     Serial.print(adjustment);
-    
+
     analogWrite(GREEN_OUTPUT, max(1, GREEN_BASE_LEVEL * adjustment));
     Serial.print(" green:");
     Serial.print(GREEN_BASE_LEVEL * adjustment);
-    
+
     analogWrite(BLUE_OUTPUT, max(1, BLUE_BASE_LEVEL * adjustment));
     Serial.print(" blue:");
     Serial.print(BLUE_BASE_LEVEL * adjustment);
-    
+
     analogWrite(RED_OUTPUT, max(1, RED_BASE_LEVEL * adjustment));
     Serial.print(" red:");
     Serial.print(RED_BASE_LEVEL * adjustment);
@@ -137,9 +147,3 @@ void adjust(byte level) {
   }
 }
 
-void busy_wait(unsigned long delay) {
-  unsigned long delay_start = millis();
-  while (millis() - delay_start < delay) {
-    // Do nothing
-  }
-}
