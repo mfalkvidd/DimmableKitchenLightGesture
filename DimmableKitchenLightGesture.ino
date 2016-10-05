@@ -15,8 +15,8 @@
 #define RED_BASE_LEVEL 255
 #define WW_BASE_LEVEL 255
 
-#define LOCK_TIME 700
-#define LOCK_THRESHOLD 12
+#define LOCK_TIME 500
+#define LOCK_THRESHOLD 30
 
 // Global Variables
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
@@ -85,7 +85,7 @@ void set_light_level (byte level) {
         adjust(level); // Set level back to selected level
         last_lock_level = 0;
         last_lock_time = 0;
-        delay(LOCK_TIME * 2);
+        delay(LOCK_TIME * 3);
       } else {
         adjust(level);
       }
@@ -115,12 +115,8 @@ void adjust(byte level) {
     digitalWrite(RED_OUTPUT, HIGH);
     digitalWrite(WW_OUTPUT, HIGH);
   } else {
-    if (level > 185) {
+    if (level > 125) {
       level = 255;
-    } else if (level > 145) {
-      level = 185;
-    } else if (level > 105) {
-      level = 125;
     } else if (level > 65) {
       level = 75;
     } else {
