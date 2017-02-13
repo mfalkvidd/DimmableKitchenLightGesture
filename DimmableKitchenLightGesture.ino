@@ -15,8 +15,8 @@
 #define RED_BASE_LEVEL 255
 #define WW_BASE_LEVEL 255
 
-#define LOCK_TIME 500
-#define LOCK_THRESHOLD 30
+#define LOCK_TIME 5
+#define LOCK_THRESHOLD 3
 
 // Global Variables
 SparkFun_APDS9960 apds = SparkFun_APDS9960();
@@ -55,7 +55,7 @@ void setup() {
   pinMode(BLUE_OUTPUT, OUTPUT);
   pinMode(RED_OUTPUT, OUTPUT);
   pinMode(WW_OUTPUT, OUTPUT);
-  set_light_level(254); // Start with very bright but not max since max is not correct temperature
+  set_light_level(255); // Start with very bright but not max since max is not correct temperature
 }
 
 void loop() {
@@ -80,12 +80,12 @@ void set_light_level (byte level) {
     if (abs(last_lock_level - level) < LOCK_THRESHOLD) {
       if (millis() - last_lock_time > LOCK_TIME) {
         // Level has been held steady for a while. Blink to acknowledge and sleep to allow time to remove hand from sensor.
-        turn_off();
-        delay(150);
+        // turn_off();
+        // delay(150);
         adjust(level); // Set level back to selected level
-        last_lock_level = 0;
-        last_lock_time = 0;
-        delay(LOCK_TIME * 3);
+        // last_lock_level = 0;
+        // last_lock_time = 0;
+        // delay(LOCK_TIME * 3);
       } else {
         adjust(level);
       }
@@ -109,37 +109,28 @@ void adjust(byte level) {
   Serial.print("level:");
   Serial.print(level);
   Serial.print(" adj:");
-  if (level == 255) {
-    digitalWrite(GREEN_OUTPUT, HIGH);
-    digitalWrite(BLUE_OUTPUT, HIGH);
-    digitalWrite(RED_OUTPUT, HIGH);
-    digitalWrite(WW_OUTPUT, HIGH);
+  if (level > 135) {
+    level = 255;
   } else {
-    if (level > 125) {
-      level = 255;
-    } else if (level > 65) {
-      level = 75;
-    } else {
-      level = 25;
-    }
-    float adjustment = level / 255.0;
-    Serial.print(adjustment);
-
-    analogWrite(GREEN_OUTPUT, max(1, GREEN_BASE_LEVEL * adjustment));
-    Serial.print(" green:");
-    Serial.print(GREEN_BASE_LEVEL * adjustment);
-
-    analogWrite(BLUE_OUTPUT, max(1, BLUE_BASE_LEVEL * adjustment));
-    Serial.print(" blue:");
-    Serial.print(BLUE_BASE_LEVEL * adjustment);
-
-    analogWrite(RED_OUTPUT, max(1, RED_BASE_LEVEL * adjustment));
-    Serial.print(" red:");
-    Serial.print(RED_BASE_LEVEL * adjustment);
-
-    analogWrite(WW_OUTPUT, max(1, WW_BASE_LEVEL * adjustment));
-    Serial.print(" ww:");
-    Serial.println(WW_BASE_LEVEL * adjustment);
+    level = 25;
   }
+  float adjustment = level / 255.0;
+  Serial.print(adjustment);
+
+  analogWrite(GREEN_OUTPUT, max(1, GREEN_BASE_LEVEL * adjustment));
+  Serial.print(" green:");
+  Serial.print(GREEN_BASE_LEVEL * adjustment);
+
+  analogWrite(BLUE_OUTPUT, max(1, BLUE_BASE_LEVEL * adjustment));
+  Serial.print(" blue:");
+  Serial.print(BLUE_BASE_LEVEL * adjustment);
+
+  analogWrite(RED_OUTPUT, max(1, RED_BASE_LEVEL * adjustment));
+  Serial.print(" red:");
+  Serial.print(RED_BASE_LEVEL * adjustment);
+
+  analogWrite(WW_OUTPUT, max(1, WW_BASE_LEVEL * adjustment));
+  Serial.print(" ww:");
+  Serial.println(WW_BASE_LEVEL * adjustment);
 }
 
